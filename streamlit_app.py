@@ -20,16 +20,20 @@ def extract_text_from_docx(doc_file):
 # Function to interact with OpenAI API to answer questions based on document content
 def answer_question(text, question):
     openai.api_key = st.secrets["openai_api_key"]  # Fetch the OpenAI API key securely
-    prompt = f"Given the following document: {text}\nAnswer the question: {question}"
     
-    response = openai.Completion.create(
-        engine="text-davinci-003",  # or "gpt-3.5-turbo"
-        prompt=prompt,
+    messages = [
+        {"role": "system", "content": "You are a helpful assistant."},
+        {"role": "user", "content": f"Given the following document: {text}\nAnswer the question: {question}"}
+    ]
+    
+    response = openai.ChatCompletion.create(
+        model="gpt-3.5-turbo",  # Use the ChatCompletion endpoint
+        messages=messages,
         max_tokens=500,
         temperature=0.5
     )
     
-    answer = response.choices[0].text.strip()
+    answer = response.choices[0].message['content'].strip()
     return answer
 
 # Streamlit app
