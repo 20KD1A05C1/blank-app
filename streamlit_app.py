@@ -1,10 +1,8 @@
-
 import streamlit as st
 from PyPDF2 import PdfReader
 import docx
 from langchain import OpenAI
 from langchain.prompts import PromptTemplate
-from langchain.document_loaders import TextLoader
 
 # Function to extract text from a PDF
 def extract_text_from_pdf(pdf_file):
