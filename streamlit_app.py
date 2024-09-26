@@ -1,8 +1,7 @@
 import streamlit as st
 from PyPDF2 import PdfReader
 import docx
-from langchain import OpenAI
-from langchain.prompts import PromptTemplate
+import openai
 
 # Function to extract text from a PDF
 def extract_text_from_pdf(pdf_file):
@@ -18,16 +17,20 @@ def extract_text_from_docx(doc_file):
     text = '\n'.join([para.text for para in doc.paragraphs])
     return text
 
-# Function to answer user questions based on document content
+# Function to interact with OpenAI API to answer questions based on document content
 def answer_question(text, question):
-    # Using a simple LLM like OpenAI for Q&A
-    llm = OpenAI(model="gpt-3.5-turbo")
-    prompt_template = PromptTemplate(
-        input_variables=["text", "question"],
-        template="Given the following document: {text}, answer the question: {question}"
+    openai.api_key = st.secrets["openai_api_key"]  # Fetch the OpenAI API key securely
+    prompt = f"Given the following document: {text}\nAnswer the question: {question}"
+    
+    response = openai.Completion.create(
+        engine="text-davinci-003",  # or "gpt-3.5-turbo"
+        prompt=prompt,
+        max_tokens=500,
+        temperature=0.5
     )
-    prompt = prompt_template.format(text=text, question=question)
-    return llm(prompt)
+    
+    answer = response.choices[0].text.strip()
+    return answer
 
 # Streamlit app
 def main():
